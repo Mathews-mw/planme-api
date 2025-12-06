@@ -1,0 +1,53 @@
+{
+  "name": "planme_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx --no-warnings --env-file=.env --watch src/infra/server.ts",
+    "start": "node build/server.js",
+    "build": "tsup src --out-dir build",
+    "lint": "eslint --ext .ts --fix src",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:debug": "vitest --inspect-brk --inspect --logHeapUsage --threads=false",
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
+    "test:e2e:watch": "vitest --config ./vitest.config.e2e.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tsconfig/node24": "24.0.3",
+    "@types/node": "^24.10.1",
+    "@typescript-eslint/eslint-plugin": "8.48.1",
+    "@typescript-eslint/parser": "8.48.1",
+    "@vitest/coverage-v8": "4.0.15",
+    "eslint": "9.39.1",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-config-standard": "17.1.0",
+    "eslint-import-resolver-typescript": "4.4.4",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-n": "17.23.1",
+    "eslint-plugin-prettier": "5.5.4",
+    "eslint-plugin-promise": "7.2.1",
+    "globals": "16.5.0",
+    "jiti": "2.6.1",
+    "prettier": "3.7.4",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "8.48.1",
+    "unplugin-swc": "1.5.9",
+    "vite-tsconfig-paths": "5.1.4",
+    "vitest": "4.0.15"
+  },
+  "dependencies": {
+    "bcryptjs": "3.0.3",
+    "dayjs": "1.11.19",
+    "reflect-metadata": "0.2.2",
+    "tsyringe": "4.10.0",
+    "zod": "4.1.13"
+  }
+}

@@ -1,0 +1,20 @@
+node_modules
+dist
+build
+
+# Keep environment variables out of version control
+.env
+
+notes.md
+
+tmp/uploads/**
+service-account-key.json
+
+jwtRS256.key
+jwtRS256.key.pub
+
+prisma/seeds/seed.ts
+
+tmp/chat-uploads/**
+
+*-notes.md
