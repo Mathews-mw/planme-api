@@ -5,9 +5,10 @@ import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error';
 
 interface IRequest {
 	id: string;
-	name: string;
-	email: string;
+	name?: string;
+	email?: string;
 	avatarUrl?: string;
+	timezone?: string;
 }
 
 type Response = Outcome<ResourceNotFoundError, { user: User }>;
@@ -15,7 +16,7 @@ type Response = Outcome<ResourceNotFoundError, { user: User }>;
 export class EditUserUseCase {
 	constructor(private usersRepository: IUserRepository) {}
 
-	async execute({ id, name, email, avatarUrl }: IRequest): Promise<Response> {
+	async execute({ id, name, email, timezone, avatarUrl }: IRequest): Promise<Response> {
 		const user = await this.usersRepository.findById(id);
 
 		if (!user) {
@@ -24,6 +25,7 @@ export class EditUserUseCase {
 
 		user.name = name ?? user.name;
 		user.email = email ?? user.email;
+		user.timezone = timezone ?? user.timezone;
 		user.avatarUrl = avatarUrl ?? user.avatarUrl;
 
 		await this.usersRepository.update(user);

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import z from 'zod';
 
-const code = z
+const codeSchema = z
 	.union([
 		z.literal('BAD_REQUEST_ERROR'),
 		z.literal('SAME_EMAIL_ERROR'),
@@ -10,7 +11,7 @@ const code = z
 	])
 	.default('BAD_REQUEST_ERROR');
 
-type Code = z.infer<typeof code>;
+type Code = z.infer<typeof codeSchema>;
 
 export class BadRequestError extends Error {
 	readonly code: Code;

@@ -1,4 +1,4 @@
-import { Account, AccountProvider } from '@/domains/chat/models/entities/account';
+import { Account, AccountProvider } from '@/domains/planme/models/entities/account';
 
 export interface IParams {
 	userId: string;
@@ -6,8 +6,8 @@ export interface IParams {
 }
 
 export interface IAccountRepository {
-	create(account: Account): Promise<Account>;
-	update(account: Account): Promise<Account>;
+	create(account: Account): Promise<void>;
+	update(account: Account): Promise<void>;
 	delete(account: Account): Promise<void>;
 	findManyByUserId(userId: string): Promise<Account[]>;
 	findById(id: string): Promise<Account | null>;

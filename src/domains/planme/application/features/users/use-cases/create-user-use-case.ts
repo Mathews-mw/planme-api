@@ -15,6 +15,7 @@ interface IRequest {
 	email: string;
 	password: string;
 	avatarUrl?: string;
+	timezone?: string;
 }
 
 type Response = Outcome<BadRequestError, { user: User }>;
@@ -26,7 +27,7 @@ export class CreateUserUseCase {
 		private accountsRepository: IAccountRepository
 	) {}
 
-	async execute({ name, email, password, avatarUrl }: IRequest): Promise<Response> {
+	async execute({ name, email, password, avatarUrl, timezone }: IRequest): Promise<Response> {
 		const userWithSameEmail = await this.usersRepository.findByEmail(email);
 
 		if (userWithSameEmail) {
@@ -40,6 +41,7 @@ export class CreateUserUseCase {
 			email,
 			password: hashPassword,
 			avatarUrl,
+			timezone,
 		});
 
 		const newAccount = Account.create({

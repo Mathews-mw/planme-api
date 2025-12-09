@@ -33,7 +33,7 @@ export default defineConfig([
       camelcase: "off",
       "no-undef": "off",
       "prefer-const": "off",
-      "no-unused-vars": 0,
+      "no-unused-vars": "off",
       "dot-notation": "off",
       "no-useless-constructor": "off",
       "no-trailing-spaces": "error",

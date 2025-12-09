@@ -19,6 +19,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@faker-js/faker": "10.1.0",
     "@tsconfig/node24": "24.0.3",
     "@types/node": "^24.10.1",
     "@typescript-eslint/eslint-plugin": "8.48.1",

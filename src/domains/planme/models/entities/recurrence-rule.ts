@@ -32,7 +32,7 @@ interface IRecurrenceRuleProps {
 	dayOfMonth?: number | null;
 	weekOfMonth?: number | null;
 	weekdayOfMonth?: number | null; // 1..5 or -1(last);
-	maxOccurrences: number;
+	maxOccurrences?: number | null;
 }
 
 export class RecurrenceRule extends Entity<IRecurrenceRuleProps> {
@@ -112,16 +112,18 @@ export class RecurrenceRule extends Entity<IRecurrenceRuleProps> {
 		return this.props.maxOccurrences;
 	}
 
-	set maxOccurrences(maxOccurrences: number) {
+	set maxOccurrences(maxOccurrences: number | undefined | null) {
 		this.props.maxOccurrences = maxOccurrences;
 	}
 
-	static create(props: Optional<IRecurrenceRuleProps, 'endType' | 'maxOccurrences'>, id?: UniqueEntityId) {
+	static create(props: Optional<IRecurrenceRuleProps, 'endType'>, id?: UniqueEntityId) {
+		const maxOccurrences = props.endType === 'ONCE' ? 1 : props.maxOccurrences;
+
 		const recurrenceRule = new RecurrenceRule(
 			{
 				...props,
 				endType: props.endType ?? 'ONCE',
-				maxOccurrences: props.maxOccurrences ?? 1,
+				maxOccurrences: maxOccurrences,
 			},
 			id
 		);

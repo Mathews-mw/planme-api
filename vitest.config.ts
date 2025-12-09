@@ -6,6 +6,7 @@ export default defineConfig({
 	test: {
 		globals: true,
 		root: './',
+		setupFiles: ['./tests/setup.ts'],
 	},
 	plugins: [tsConfigPaths(), swc.vite({ module: { type: 'es6' } })],
 });
