@@ -22,7 +22,7 @@ export const recurrenceEndTypeSchema = z.union([
 export type IRecurrenceFrequency = z.infer<typeof recurrenceFrequencySchema>;
 export type IRecurrenceEndType = z.infer<typeof recurrenceEndTypeSchema>;
 
-interface IRecurrenceRuleProps {
+export interface IRecurrenceRuleProps {
 	frequency: IRecurrenceFrequency;
 	endType: IRecurrenceEndType;
 	startDateTime: Date;

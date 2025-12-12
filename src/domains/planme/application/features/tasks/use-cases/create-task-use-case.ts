@@ -2,9 +2,11 @@ import { injectable } from 'tsyringe';
 
 import { Outcome, success } from '@/core/outcome';
 import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { BadRequestError } from '@/core/errors/bad-request-errors';
+import { TaskOccurrence } from '@/domains/planme/models/entities/task-occurrence';
 import { ITaskDefinitionRepository } from '../repositories/task-definition-repository';
 import { IRecurrenceRuleRepository } from '../repositories/recurrence-rule-repository';
+import { ITaskOccurrenceRepository } from '../repositories/task-occurrence-repository';
+import { TaskOccurrencesPlanner } from '../../recurrence/services/task-occurrences-planner';
 import { ITaskPriority, TaskDefinition } from '@/domains/planme/models/entities/task-definition';
 import {
 	IRecurrenceEndType,
@@ -17,8 +19,8 @@ interface IRequest {
 	title: string;
 	description?: string | null;
 	deadline?: Date | null;
-	priority: ITaskPriority;
-	isAllDay: boolean;
+	priority?: ITaskPriority;
+	isAllDay?: boolean;
 	recurrence: {
 		frequency: IRecurrenceFrequency;
 		endType?: IRecurrenceEndType;
@@ -33,13 +35,15 @@ interface IRequest {
 	};
 }
 
-type Response = Outcome<BadRequestError, { taskDefinition: TaskDefinition; recurrenceRule: RecurrenceRule }>;
+type Response = Outcome<null, { taskDefinition: TaskDefinition; recurrenceRule: RecurrenceRule }>;
 
 @injectable()
-export class CreateTaskDefinition {
+export class CreateTaskUseCase {
 	constructor(
 		private taskDefinitionRepository: ITaskDefinitionRepository,
-		private recurrenceRuleRepository: IRecurrenceRuleRepository
+		private recurrenceRuleRepository: IRecurrenceRuleRepository,
+		private taskOccurrenceRepository: ITaskOccurrenceRepository,
+		private occurrencesPlanner: TaskOccurrencesPlanner
 	) {}
 
 	async execute({ userId, title, description, deadline, priority, isAllDay, recurrence }: IRequest): Promise<Response> {
@@ -68,6 +72,26 @@ export class CreateTaskDefinition {
 
 		await this.recurrenceRuleRepository.create(recurrenceRule);
 		await this.taskDefinitionRepository.create(taskDefinition);
+
+		const now = new Date();
+		const generateOccurrences = this.occurrencesPlanner.generateInitialOccurrences({
+			rule: recurrenceRule,
+			fromDate: now,
+			horizonDays: 1,
+		});
+
+		if (generateOccurrences.length > 0) {
+			const firstOccurrenceDay = generateOccurrences[0];
+
+			const occurrence = TaskOccurrence.create({
+				taskDefinitionId: taskDefinition.id,
+				occurrenceDateTime: firstOccurrenceDay,
+				status: 'PENDING',
+				createdAt: new Date(),
+			});
+
+			await this.taskOccurrenceRepository.create(occurrence);
+		}
 
 		return success({ taskDefinition, recurrenceRule });
 	}

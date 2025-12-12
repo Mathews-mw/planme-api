@@ -77,6 +77,7 @@ export class Subtask extends Entity<ISubtaskProps> {
 	}
 
 	complete() {
+		this.props.isCompleted = true;
 		this.props.completedAt = new Date();
 		this._touch();
 	}

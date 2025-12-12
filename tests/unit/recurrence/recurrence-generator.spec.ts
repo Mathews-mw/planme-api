@@ -7,8 +7,8 @@ import weekOfYear from 'dayjs/plugin/weekOfYear';
 import objectSupport from 'dayjs/plugin/objectSupport';
 
 import { RecurrenceRule } from '@/domains/planme/models/entities/recurrence-rule';
-import { encodeWeekdays, Weekday } from '@/domains/planme/application/features/recurrence/weekdays-bitmask';
-import { generateOccurrences } from '@/domains/planme/application/features/recurrence/recurrence-generator';
+import { generateOccurrences } from '@/domains/planme/application/features/recurrence/services/recurrence-generator';
+import { encodeWeekdays, Weekday } from '@/domains/planme/application/features/recurrence/services/weekdays-bitmask';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

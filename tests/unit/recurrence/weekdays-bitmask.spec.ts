@@ -7,7 +7,7 @@ import {
 	Weekday,
 	WeekdayBit,
 	weekdayFromJsDay,
-} from '@/domains/planme/application/features/recurrence/weekdays-bitmask';
+} from '@/domains/planme/application/features/recurrence/services/weekdays-bitmask';
 
 describe('Weekdays Bitmask', () => {
 	describe('encodeWeekdays', () => {

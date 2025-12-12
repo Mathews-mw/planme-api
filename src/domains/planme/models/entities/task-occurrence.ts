@@ -33,6 +33,15 @@ export class TaskOccurrence extends Entity<ITaskOccurrenceProps> {
 		this._touch();
 	}
 
+	get occurrenceDateTime() {
+		return this.props.occurrenceDateTime;
+	}
+
+	set occurrenceDateTime(occurrenceDateTime: Date) {
+		this.props.occurrenceDateTime = occurrenceDateTime;
+		this._touch();
+	}
+
 	get status() {
 		return this.props.status;
 	}
