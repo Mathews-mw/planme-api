@@ -1,0 +1,195 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---- ENUMS ----
+
+enum AccountProvider {
+  CREDENTIALS
+  GOOGLE
+}
+
+enum TokenType {
+  PASSWORD_RECOVER
+  PASSWORD_RESET
+}
+
+enum TaskPriority {
+  LOW
+  NORMAL
+  HIGH
+  NONE
+}
+
+enum TaskStatus {
+  PENDING
+  COMPLETED
+  CANCELED
+  SKIPPED
+}
+
+enum RecurrenceFrequency {
+  NONE
+  DAILY_INTERVAL
+  WEEKLY_DAYS
+  MONTHLY_DAY_OF_MONTH
+  MONTHLY_WEEKDAYS_OF_MONTH
+  YEARLY_INTERVAL
+}
+
+enum RecurrenceEndType {
+  ONCE
+  NEVER
+  ON_DATE
+  AFTER_OCCURRENCES
+}
+
+// ---- MODELS ----
+
+model User {
+  id        String    @id @unique @default(uuid())
+  name      String
+  email     String    @unique
+  password  String?
+  avatarUrl String?   @map("avatar_url")
+  timezone  String    @default("UTC")
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+
+  session         Session?
+  accounts        Account[]
+  tokens          Token[]
+  taskDefinitions TaskDefinition[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String          @id @unique @default(uuid())
+  userId            String          @map("user_id")
+  provider          AccountProvider
+  providerAccountId String          @unique @map("provider_account_id")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime?       @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @unique @default(uuid())
+  userId       String   @unique @map("user_id")
+  sessionToken String
+  expiresAt    DateTime @map("expires_at")
+  registerAt   DateTime @map("register_at")
+
+  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      TokenType
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@map("tokens")
+}
+
+model RecurrenceRule {
+  id              String              @id @unique @default(uuid())
+  frequency       RecurrenceFrequency
+  endType         RecurrenceEndType   @map("end_type")
+  startDateTime   DateTime            @map("start_date_time")
+  endDate         DateTime?           @map("end_date")
+  interval        Int?
+  weekdaysBitmask Int?                @map("weekdays_bitmask")
+  dayOfMonth      Int?                @map("day_of_month")
+  weekOfMonth     Int?                @map("week_of_month")
+  weekdayOfMonth  Int?                @map("weekday_of_month")
+  maxOccurrences  Int?                @map("max_occurrences")
+
+  // Relação 1:1 com TaskDefinition (cada task tem uma regra e cada regra pertence a 1 task)
+  taskDefinition TaskDefinition?
+
+  @@index([frequency])
+  @@map("recurrence_rules")
+}
+
+model TaskDefinition {
+  id               String @id @unique @default(uuid())
+  userId           String @map("user_id")
+  recurrenceRuleId String @unique @map("recurrence_rule_id")
+
+  title       String
+  description String?
+  deadline    DateTime?
+  priority    TaskPriority @default(NONE)
+  isAllDay    Boolean      @default(false) @map("is_all_day")
+  isStarred   Boolean      @default(false) @map("is_starred")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime?    @updatedAt @map("updated_at")
+
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recurrenceRule RecurrenceRule   @relation(fields: [recurrenceRuleId], references: [id], onDelete: Cascade)
+  occurrences    TaskOccurrence[]
+  subtasks       Subtask[]
+
+  @@index([userId])
+  @@index([isStarred])
+  @@index([deadline])
+  @@map("task_definitions")
+}
+
+model TaskOccurrence {
+  id               String @id @unique @default(uuid())
+  taskDefinitionId String @map("task_definition_id")
+
+  occurrenceDateTime DateTime   @map("occurrence_date_time")
+  status             TaskStatus @default(PENDING)
+  note               String?
+  completedAt        DateTime?  @map("completed_at")
+  createdAt          DateTime   @default(now()) @map("created_at")
+  updatedAt          DateTime?  @updatedAt @map("updated_at")
+
+  taskDefinition TaskDefinition @relation(fields: [taskDefinitionId], references: [id], onDelete: Cascade)
+
+  @@index([taskDefinitionId, occurrenceDateTime])
+  @@index([status])
+  @@map("task_occurrences")
+}
+
+model Subtask {
+  id               String @id @unique @default(uuid())
+  taskDefinitionId String @map("task_definition_id")
+
+  title       String
+  description String?
+  position    Int
+  isCompleted Boolean   @default(false) @map("is_completed")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
+
+  taskDefinition TaskDefinition @relation(fields: [taskDefinitionId], references: [id], onDelete: Cascade)
+
+  @@index([taskDefinitionId, position])
+  @@map("subtasks")
+}

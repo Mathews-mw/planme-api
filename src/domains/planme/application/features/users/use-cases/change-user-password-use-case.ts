@@ -1,4 +1,5 @@
 import { compare, hash } from 'bcryptjs';
+import { inject, injectable } from 'tsyringe';
 
 import { failure, Outcome, success } from '@/core/outcome';
 import { User } from '@/domains/planme/models/entities/user';
@@ -6,6 +7,7 @@ import cryptographyConfig from '@/config/cryptography-config';
 import { IUserRepository } from '../repositories/user-repository';
 import { BadRequestError } from '@/core/errors/bad-request-errors';
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error';
+import { DEPENDENCY_IDENTIFIERS } from '@/shared/di/containers/dependency-identifiers';
 
 interface IRequest {
 	id: string;
@@ -15,8 +17,9 @@ interface IRequest {
 
 type Response = Outcome<ResourceNotFoundError | BadRequestError, { user: User }>;
 
+@injectable()
 export class ChangeUserPasswordUseCase {
-	constructor(private usersRepository: IUserRepository) {}
+	constructor(@inject(DEPENDENCY_IDENTIFIERS.USERS_REPOSITORY) private usersRepository: IUserRepository) {}
 
 	async execute({ id, newPassword, oldPassword }: IRequest): Promise<Response> {
 		const user = await this.usersRepository.findById(id);

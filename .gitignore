@@ -18,3 +18,4 @@ prisma/seeds/seed.ts
 tmp/chat-uploads/**
 
 *-notes.md
+/generated/prisma

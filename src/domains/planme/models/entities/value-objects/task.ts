@@ -1,11 +1,13 @@
 import { Subtask } from '../subtask';
-import { ValueObject } from '@/core/entities/value-object';
 import { ITaskDefinitionProps } from '../task-definition';
 import { IRecurrenceRuleProps } from '../recurrence-rule';
+import { ITaskOccurrenceProps } from '../task-occurrence';
+import { ValueObject } from '@/core/entities/value-object';
 
 export interface ITaskProps {
 	taskDefinition: ITaskDefinitionProps;
 	recurrenceRule: IRecurrenceRuleProps;
+	occurrences?: Array<ITaskOccurrenceProps> | null;
 	subtasks?: Array<Subtask> | null;
 }
 
@@ -16,6 +18,10 @@ export class Task extends ValueObject<ITaskProps> {
 
 	get recurrenceRule() {
 		return this.props.recurrenceRule;
+	}
+
+	get occurrences() {
+		return this.props.occurrences;
 	}
 
 	get subtasks() {

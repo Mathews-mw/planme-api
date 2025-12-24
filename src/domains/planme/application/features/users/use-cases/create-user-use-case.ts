@@ -1,6 +1,6 @@
 import { hash } from 'bcryptjs';
-import { injectable } from 'tsyringe';
 import { randomUUID } from 'node:crypto';
+import { inject, injectable } from 'tsyringe';
 
 import { failure, Outcome, success } from '@/core/outcome';
 import { User } from '@/domains/planme/models/entities/user';
@@ -9,6 +9,7 @@ import { IUserRepository } from '../repositories/user-repository';
 import { BadRequestError } from '@/core/errors/bad-request-errors';
 import { Account } from '@/domains/planme/models/entities/account';
 import { IAccountRepository } from '../repositories/account-repository';
+import { DEPENDENCY_IDENTIFIERS } from '@/shared/di/containers/dependency-identifiers';
 
 interface IRequest {
 	name: string;
@@ -23,8 +24,8 @@ type Response = Outcome<BadRequestError, { user: User }>;
 @injectable()
 export class CreateUserUseCase {
 	constructor(
-		private usersRepository: IUserRepository,
-		private accountsRepository: IAccountRepository
+		@inject(DEPENDENCY_IDENTIFIERS.USERS_REPOSITORY) private usersRepository: IUserRepository,
+		@inject(DEPENDENCY_IDENTIFIERS.ACCOUNTS_REPOSITORY) private accountsRepository: IAccountRepository
 	) {}
 
 	async execute({ name, email, password, avatarUrl, timezone }: IRequest): Promise<Response> {
